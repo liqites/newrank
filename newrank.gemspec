@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.description = "A Crawler for NewRank"
   s.authors     = ["Tesla Lee"]
   s.email       = 'leechee89@gmail.com'
-  s.files       = ["lib/newrank.rb", "lib/assets/newrank_md5.js"]
+  s.files       = ["lib/newrank.rb"]
   s.homepage    =
     'https://github.com/liqites/newrank_crawler'
   s.license       = 'MIT'
