@@ -1,2 +1,2 @@
 # newrank
-gem for newrank(新榜) crawler
+gem for newrank crawler
