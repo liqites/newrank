@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
   s.version     = '0.2.0'
   s.date        = '2016-10-25'
   s.summary     = "Newrank Crawler"
-  s.description = "用于爬取新榜自媒体数据的爬虫"
+  s.description = "A Crawler for NewRank"
   s.authors     = ["Tesla Lee"]
   s.email       = 'leechee89@gmail.com'
   s.files       = ["lib/newrank.rb", "lib/assets/newrank_md5.js"]
