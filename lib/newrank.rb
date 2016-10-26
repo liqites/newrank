@@ -131,7 +131,7 @@ class Newrank
   
   # js context
   def js_context
-    file_path = File.join( File.dirname(__FILE__), './assets/newrank_md5.js')
+    file_path = File.join( File.dirname(__FILE__), 'assets/newrank_md5.js')
     @context ||= ExecJS.compile(File.read(file_path))
   end
   #------------------------
