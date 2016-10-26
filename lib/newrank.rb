@@ -3,7 +3,6 @@ require 'open-uri'
 require 'rkelly'
 require 'nokogiri'
 require 'json'
-require 'v8'
 require 'execjs'
 require 'rest-client'
 
