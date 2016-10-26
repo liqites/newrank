@@ -8,7 +8,7 @@ require 'execjs'
 require 'rest-client'
 
 class Newrank
-  # crawl account info
+  # crawl newrank info
   def crawl(newrank_id)
     doc = document(newrank_id.gsub("\u{a0}",""))
     if !doc.nil?
@@ -41,7 +41,8 @@ class Newrank
       }
     end
   end
-
+  
+  # crawl posts
   def fetch_post(uuid)
     nonce = gen_nonce
 		xyz = gen_xyz(nonce, uuid)
@@ -49,8 +50,7 @@ class Newrank
     posts = JSON.parse(RestClient.post("http://www.newrank.cn/xdnphb/detail/getAccountArticle", {uuid: uuid, nonce: nonce, xyz: xyz}, {"User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36"}))
   end
 
-  # private
-
+  # crawl week data
   def week_data(doc)
     data = []
 
@@ -65,12 +65,14 @@ class Newrank
 
     data
   end
-
+  
+  # get Nogogiri Document
   def document(newrank_account)
     url = 'http://www.newrank.cn/public/info/detail.html?account=' + newrank_account
     Nokogiri::HTML(open(url, "User-Agent" => "Mozilla/5.0 (Windows NT 6.2; rv:10.0.1) Gecko/20100101 Firefox/10.0.1", :read_timeout => 10), nil, 'utf-8')
   end
-
+  
+  # find score and uuid
   def score_and_uuid(doc)
     score, uuid = nil
 
@@ -93,11 +95,14 @@ class Newrank
 
     return score, uuid
   end
-
+  
+  # wait for seconds
+  # instead of request too much
   def wait_for_seconds
 		sleep(1 * rand)
 	end
-
+  
+  # generate parameter nonce
 	def gen_nonce
 		a = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a","b", "c", "d", "e", "f"]
 		b = 0
@@ -113,16 +118,19 @@ class Newrank
 		end
     c
 	end
-
+  
+  # generate parameter xyz
 	def gen_xyz(nonce, uuid)
     h = "/xdnphb/detail/getAccountArticle?AppKey=joker&uuid=#{uuid}&nonce=#{nonce}"
 	  _md5(h)
 	end
-
+  
+  # use js md5 algorightm, written by newrank, file in assets/newrank_md5.js
   def _md5(str)
     js_context.call('newrank_md5', str, bare: true)
   end
-
+  
+  # js context
   def js_context
     file_path = File.join( File.dirname(__FILE__), './assets/newrank_md5.js')
     @context ||= ExecJS.compile(File.read(file_path))

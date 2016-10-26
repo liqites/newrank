@@ -7,6 +7,10 @@ RSpec.describe Newrank do
 
   describe "#crawl" do
     it "should get json" do
+      data = Newrank.new.crawl('rmrbwx')
+      puts data.keys
+      puts data[:week_data][0].keys
+      puts data[:posts_data].keys
       expect(Newrank.new.crawl('rmrbwx')[:posts_data].count).to be > 0
     end
   end
