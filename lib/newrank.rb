@@ -1,4 +1,3 @@
-# coding: utf-8
 require 'open-uri'
 require 'rkelly'
 require 'nokogiri'
@@ -46,7 +45,9 @@ class Newrank
     nonce = gen_nonce
 		xyz = gen_xyz(nonce, uuid)
 
-    posts = JSON.parse(RestClient.post("http://www.newrank.cn/xdnphb/detail/getAccountArticle", {uuid: uuid, nonce: nonce, xyz: xyz}, {"User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36"}))
+    wait_for_seconds
+
+    posts = JSON.parse(RestClient.post("http://www.newrank.cn/xdnphb/detail/getAccountArticle", {uuid: uuid, nonce: nonce, xyz: xyz, flag: true}, {"User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36"}))
   end
 
   # crawl week data
@@ -67,6 +68,7 @@ class Newrank
   
   # get Nogogiri Document
   def document(newrank_account)
+    wait_for_seconds
     url = 'http://www.newrank.cn/public/info/detail.html?account=' + newrank_account
     Nokogiri::HTML(open(url, "User-Agent" => "Mozilla/5.0 (Windows NT 6.2; rv:10.0.1) Gecko/20100101 Firefox/10.0.1", :read_timeout => 10), nil, 'utf-8')
   end
@@ -75,11 +77,15 @@ class Newrank
   def score_and_uuid(doc)
     score, uuid = nil
 
-    script = doc.css("script")[0]
+    script = doc.css("script[type='text/javascript']")[0]
     if !script.nil?
       parser = RKelly::Parser.new
       ast = parser.parse(script.text.strip)
+
+      # 找到第一个数组节点
       array_node = ast.pointcut(RKelly::Nodes::ArrayNode).matches.first
+
+      # 找到数组节点内地第一个Element Node并寻找Score
       element_node = array_node.pointcut(RKelly::Nodes::ElementNode).matches.first
       json_data = element_node.nil? ? {} : JSON.parse(element_node.to_ecma)
       if json_data["new_rank_index_mark"]
@@ -87,9 +93,15 @@ class Newrank
       else
         score = 0.0
       end
-      object_node = ast.pointcut(RKelly::Nodes::AssignExprNode).matches[-1]
-      node = object_node.pointcut(RKelly::Nodes::PropertyNode).matches.select{|n| n.name == '"uuid"'}.first.value
-      uuid = node.value[1..-2]
+
+      # 找到有UUID的Node
+      object_node = ast.pointcut(RKelly::Nodes::VarDeclNode).matches.select{|node| node.name == "fgkcdg"}.first
+      unless object_node.nil?
+        node = object_node.pointcut(RKelly::Nodes::PropertyNode).matches.select{|n| n.name == '"uuid"'}.first.value
+        uuid = node.value[1..-2]
+      else
+        uuid = "uuid nil"
+      end
     end
 
     return score, uuid
@@ -98,7 +110,7 @@ class Newrank
   # wait for seconds
   # instead of request too much
   def wait_for_seconds
-		sleep(1 * rand)
+		sleep(1 * rand + 1)
 	end
   
   # generate parameter nonce
@@ -120,7 +132,7 @@ class Newrank
   
   # generate parameter xyz
 	def gen_xyz(nonce, uuid)
-    h = "/xdnphb/detail/getAccountArticle?AppKey=joker&uuid=#{uuid}&nonce=#{nonce}"
+    h = "/xdnphb/detail/getAccountArticle?AppKey=joker&flag=true&uuid=#{uuid}&nonce=#{nonce}"
 	  _md5(h)
 	end
   
