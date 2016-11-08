@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'newrank'
-  s.version     = '0.3.2'
+  s.version     = '0.3.3'
   s.date        = '2016-10-25'
   s.summary     = "Newrank Crawler"
   s.description = "A Crawler for NewRank"
