@@ -1,4 +1,7 @@
 # newrank
+
+[Deprecated!]
+
 gem for newrank crawler
 
 `gem 'newrank'` or `gem install newrank`
